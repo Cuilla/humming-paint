@@ -72,7 +72,7 @@ def clear_canvas():
 
 # 1. Create the main window
 root = tk.Tk()
-root.title("Humming Paint v0.1")
+root.title("Humming Paint v1.0")
 
 # 2. Create a frame for control buttons
 controls_frame = tk.Frame(root, bd=2, relief=tk.RAISED)

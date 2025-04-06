@@ -118,7 +118,7 @@ def clear_canvas():
 
 # --- GUI Setup ---
 root = tk.Tk()
-root.title("Humming Paint v0.2 (with Eraser!)")
+root.title("Humming Paint v2.0 (with Eraser!)")
 
 controls_frame = tk.Frame(root, bd=2, relief=tk.RAISED)
 controls_frame.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
