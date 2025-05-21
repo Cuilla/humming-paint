@@ -3,20 +3,16 @@ from tkinter import colorchooser
 from tkinter import simpledialog
 from tkinter import font
 
-# --- Global Variables ---
 shape_start_x, shape_start_y = None, None
 prev_x, prev_y = None, None
 temp_shape_id = None
 current_color = "black"
 current_width = 1
-current_font_size = 12 # NEW: Variable for font size, default 12pt
+current_font_size = 12 
 canvas_bg_color = "white"
-current_mode = "pencil" # Modes: "pencil", "eraser", "square", "circle", "text"
+current_mode = "pencil" 
 
-# --- Variables for buttons ---
 tool_buttons = {}
-
-# --- Functions ---
 
 def update_button_states():
     """Updates the relief of all tool buttons based on current_mode."""
@@ -37,7 +33,7 @@ def activate_mode(mode):
         "pencil": "pencil", "eraser": "dotbox", "square": "crosshair",
         "circle": "crosshair", "text": "xterm"
     }
-    canvas.config(cursor=cursors.get(mode, "")) # Set cursor or default
+    canvas.config(cursor=cursors.get(mode, "")) 
     update_button_states()
 
 
@@ -53,7 +49,6 @@ def start_draw(event):
     if current_mode in ["pencil", "eraser"]:
         prev_x, prev_y = event.x, event.y
         draw_color = get_drawing_color()
-        # Use create_line for single pixel dot if width is 1, otherwise oval
         if current_width <= 1 and current_mode == "pencil":
              canvas.create_line(event.x, event.y, event.x+1, event.y, fill=draw_color, width=1)
         elif current_width <= 1 and current_mode == "eraser":
@@ -66,13 +61,11 @@ def start_draw(event):
     elif current_mode in ["square", "circle"]:
         shape_start_x, shape_start_y = event.x, event.y
     elif current_mode == "text":
-        # --- Text Drawing Logic ---
         user_text = simpledialog.askstring("Enter Text", "Text to draw:", parent=root)
         if user_text:
-            # Use current_font_size here!
             canvas.create_text(event.x, event.y, text=user_text,
                                fill=current_color, anchor=tk.NW,
-                               font=("Arial", current_font_size), # Use the variable
+                               font=("Arial", current_font_size), 
                                tags='drawn_text')
 
 
@@ -113,9 +106,8 @@ def stop_draw(event):
         draw_color = current_color
         effective_width = max(1, current_width)
         creator = canvas.create_rectangle if current_mode == "square" else canvas.create_oval
-        # Ensure start/end coordinates are valid if user just clicks
         if x1 == x2 and y1 == y2:
-             x2 += effective_width # Make a small shape for a click
+             x2 += effective_width
              y2 += effective_width
         creator(x1, y1, x2, y2, outline=draw_color, width=effective_width, tags='drawn_shape')
         shape_start_x, shape_start_y = None, None
@@ -130,7 +122,7 @@ def choose_color():
         if 'color' in tool_buttons and tool_buttons['color']:
             btn = tool_buttons['color']
             btn.config(bg=current_color, activebackground=current_color)
-            try: # Set foreground for readability
+            try: 
                 r, g, b = root.winfo_rgb(current_color)
                 brightness = (r + g + b) / 3 / 65535
                 fg_color = 'white' if brightness < 0.5 else 'black'
@@ -152,15 +144,14 @@ def set_width(size):
     current_width = new_width
     print(f"Thickness set to: {current_width}px")
 
-# --- NEW Function to set Font Size ---
 def set_font_size():
     """Opens a dialog to set the font size for the text tool."""
     global current_font_size
     new_size = simpledialog.askinteger("Font Size",
                                        "Enter font size (points):",
-                                       parent=root, minvalue=6, maxvalue=120, # Example range
+                                       parent=root, minvalue=6, maxvalue=120, 
                                        initialvalue=current_font_size)
-    if new_size is not None: # Check if user provided a value
+    if new_size is not None: 
         current_font_size = new_size
         print(f"Font size set to: {current_font_size}pt")
 
@@ -169,14 +160,13 @@ def clear_canvas():
     """Clears the entire canvas."""
     canvas.delete("all")
 
-# --- GUI Setup ---
+
 root = tk.Tk()
-root.title("Humming Paint 4.0 (With text drawing!)") # Title remains the same for now
+root.title("Humming Paint 4.0 (With text drawing!)") 
 
 controls_frame = tk.Frame(root, bd=2, relief=tk.RAISED)
 controls_frame.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
-# --- Tool Buttons ---
 btn_width = 6
 tool_buttons["pencil"] = tk.Button(controls_frame, text="Pencil", width=btn_width, command=lambda: activate_mode("pencil"))
 tool_buttons["pencil"].pack(side=tk.LEFT, padx=(5, 2), pady=2)
@@ -194,7 +184,6 @@ tool_buttons["text"] = tk.Button(controls_frame, text="Text", width=btn_width, c
 tool_buttons["text"].pack(side=tk.LEFT, padx=2, pady=2)
 
 
-# --- Color Button ---
 try: r, g, b = root.winfo_rgb(current_color); initial_fg = 'white' if (r + g + b) / 3 / 65535 < 0.5 else 'black'
 except: initial_fg = 'black'
 tool_buttons['color'] = tk.Button(controls_frame, text="Color", width=btn_width, command=choose_color,
@@ -202,8 +191,6 @@ tool_buttons['color'] = tk.Button(controls_frame, text="Color", width=btn_width,
                                   activebackground=current_color, activeforeground=initial_fg)
 tool_buttons['color'].pack(side=tk.LEFT, padx=(4, 2), pady=2)
 
-
-# --- Buttons for Width ---
 width_label = tk.Label(controls_frame, text=" Width:")
 width_label.pack(side=tk.LEFT, padx=(5,0), pady=2)
 width_btn_frame = tk.Frame(controls_frame)
@@ -214,25 +201,19 @@ tk.Button(width_btn_frame, text="5", width=2, command=lambda: set_width(5)).pack
 tk.Button(width_btn_frame, text="10", width=2, command=lambda: set_width(10)).pack(side=tk.LEFT)
 tk.Button(width_btn_frame, text="...", width=2, command=lambda: set_width('custom')).pack(side=tk.LEFT) # Custom button smaller
 
-# --- NEW Font Size Button ---
 font_size_button = tk.Button(controls_frame, text="Font Size", width=7, command=set_font_size)
 font_size_button.pack(side=tk.LEFT, padx=2, pady=2)
 
-# --- Clear Button ---
 clear_button = tk.Button(controls_frame, text="Clear All", width=8, command=clear_canvas)
 clear_button.pack(side=tk.RIGHT, padx=5, pady=2)
 
-# --- Canvas ---
 canvas = tk.Canvas(root, bg=canvas_bg_color)
 canvas.pack(fill=tk.BOTH, expand=True)
 
-# --- Bind Mouse Events ---
 canvas.bind("<Button-1>", start_draw)
 canvas.bind("<B1-Motion>", draw)
 canvas.bind("<ButtonRelease-1>", stop_draw)
 
-# --- Run ---
 set_width(1)
-# Font size is already defaulted to 12
 activate_mode("pencil")
 root.mainloop()
